@@ -6,10 +6,41 @@ const db = require("./data/db")
  server.use(cors())
  server.use(express.json())
 
+ server.put("/api/users/:id",editUser)
+ server.get("/api/users/:id",getUser)
+ server.delete("/api/users/:id",deleteUser)
+ server.get("/api/users",getAllUsers)
  server.post("/api/users",postUser)
-server.get("/api/users/:id",getUser)
-server.get("/api/users",getAllUsers)
 server.get("*",handleRequest)
+
+function editUser(req,res) {
+    const {id} = req.params;
+    const user = {
+        bio: req.body.bio,  
+        created_at: Date(Date.now()), 
+        name: req.body.name
+      }
+    db.update(id,user)
+      .then(data => {
+          res.json(data)
+          console.log("response from edit endpoint",data)
+      })
+      .catch(error => {
+          console/log("error from edit endpoint",error)
+      })
+}
+
+function deleteUser(req,res) {
+    const {id} = req.params;
+    db.remove(id)
+    .then(data => {
+        res.json(data)
+        console.log("removed user",data)
+    })
+    .catch(error => {
+        console.log("error from remove endpoint",error)
+    })
+}
 
 function postUser(req,res) {
     const user = {
@@ -18,31 +49,15 @@ function postUser(req,res) {
         name: req.body.name
       }
       db.insert(user)
+      res.json(user)
         .then(data => {
-            console.log("posted data",data)
-            res.json(data)
-            
+            console.log("posted data",data)   
         })
         .catch(error => {
             console.log("error from post endpoint",error)
         })
-
 }
 
-// function createNewHub(req, res) {
-//     const hub = {
-//       name: req.body.name,
-//       created_at: 'now',
-//     }
-  
-//     db.add(hub)
-//       .then(data => {
-//         console.log(data);
-//       })
-//       .catch(error => {
-//         console.log(error);
-//       })
-//   }
 
 function getUser(req,res)  {
     const { id } = req.params;
